@@ -27,7 +27,6 @@ def index():
 	templateData['title'] = PROJECTNAME + "- Home"
 	templateData['welcomeMessage'] = "Welcome to Stop Stories!"
 	templateData['welcomeDescription'] = "Gathering the stories of Stop and Frisk."		
-	#templateData['displayMovies']=random.sample(Movie.objects,3)
 	return render_template('home.html',**templateData)
 	
 @app.route("/addstory", methods=["GET","POST"])
@@ -67,9 +66,9 @@ def storypage(mid):
 		if mid==m.mid:
 			story=m			
 	templateData={}
-	templateData['title'] = PROJECTNAME + " - " + movie.name
-	templateData['welcomeMessage'] = movie.name
-	templateData['welcomeDescription'] = movie.description
+	templateData['title'] = PROJECTNAME + " - " + story.title
+	templateData['welcomeMessage'] = story.title
+	templateData['welcomeDescription'] = story.text
 	return render_template('storypage.html', **templateData)
 	
 
