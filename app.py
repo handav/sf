@@ -79,10 +79,11 @@ def search():
 	templateData={}
 	matches = []
 	for m in Story.objects:
-		app.logger.debug(m)
+		#app.logger.debug(m)
 		for field in [m.text, m.neighborhood, m.date, m.title, m.race]:
 			if query.lower() in field.lower():
 				matches.append(m)
+				break
 		#if query.lower() in m.text.lower() or if query.lower() in m.neighrborhood.lower():			
 	templateData['matches']=matches
 	templateData['title'] = PROJECTNAME + "- Search"
@@ -96,6 +97,7 @@ def viewstories():
 	matches = []
 	for m in Story.objects:
 		matches.append(m)
+		#app.logger.debug(m.title)		
 	templateData['matches']=matches
 	templateData['title'] = PROJECTNAME + " - All Stories"
 	templateData['welcomeMessage'] = "All Stories"
