@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 import os, re
 
-#import random
-#import time
+import random
+import time
 
 # Retrieve Flask, our framework
 # request module gives access to incoming request data
 from flask import Flask, request, render_template, redirect, abort, flash
-#from flask import render_template
+from flask import render_template
 
-#from mongoengine import *
-#from models import *
+from mongoengine import *
+from models import *
 
-#connect('mydatabase', host=os.environ.get('MONGOLAB_URI'))
+connect('mydatabase', host=os.environ.get('MONGOLAB_URI'))
 
 # create the Flask app
 app = Flask(__name__)
-#app.secret_key='some secret'
+app.secret_key='some secret'
 
 # global variables
 PROJECTNAME = "Stop Stories"
@@ -39,10 +39,12 @@ def addstory():
  	
 	if request.method == "POST" and story_form.validate():
 		story=Story()
+		story.title=request.form.get('title',None)
 		story.date=request.form.get('date', None)
 		story.age=request.form.get('age',None)
 		story.neighborhood=request.form.get('neighborhood', None)
 		story.race=request.form.get('race', None)
+		story.text=request.form.get('text', None)
 		story.mid=int(time.time())
 		story.save()
 		
@@ -53,48 +55,55 @@ def addstory():
 	templateData['title'] = PROJECTNAME + "- Add Story"		
 	templateData['welcomeMessage'] = "Add Your Story"
 	templateData['welcomeDescription'] = "Fill out the form below with information about what happened."
-	templateData['form'] = story_form #passing movie_form with / without previously submitted form data.
+	templateData['form'] = story_form #passing story_form with / without previously submitted form data.
 		
 	return render_template('addstory.html', **templateData)
 
 
-# @app.route("/addreview")
-# def addreview():
-# 	templateData={}
-# 	templateData['title'] = PROJECTNAME + "- Add Review"
-# 	templateData['welcomeMessage'] = "Add Your Rating And Review"
-# 	templateData['welcomeDescription'] = "Add a review to" + mid + "in the form below."
-# 	return render_template('addreview.html', **templateData)
-# 	
-# 	
-# @app.route("/moviepage/<int:mid>")
-# def moviepage(mid):
-# 	movie=False
-# 	for m in Movie.objects:
-# 		if mid==m.mid:
-# 			movie=m
-# 				
-# 	templateData={}
-# 	templateData['title'] = PROJECTNAME + " - " + movie.name
-# 	templateData['welcomeMessage'] = movie.name
-# 	templateData['welcomeDescription'] = movie.description
-# 	return render_template('moviepage.html', **templateData)
-# 	
-# 	
-# @app.route("/search")
-# def search():
-# 	query=request.args.get('query','')
-# 	templateData={}
-# 	matches = []
-# 	for m in Movie.objects:
-# 		if query.lower() in m.description.lower() or query.lower() in m.name.lower() or query.lower() in m.director.lower() or query.lower() in m.year.lower() or query.lower() in m.genre.lower():
-# 			matches.append(m)
-# 	templateData['matches']=matches
-# 
-# 	templateData['title'] = PROJECTNAME + "- Search"
-# 	templateData['welcomeMessage'] = "Search Results"
-# 	templateData['welcomeDescription'] = "Searching for '" + query + "'"
-# 	return render_template('search.html', **templateData)
+@app.route("/storypage/<int:mid>")
+def storypage(mid):
+	story=False
+	for m in Story.objects:
+		if mid==m.mid:
+			story=m			
+	templateData={}
+	templateData['title'] = PROJECTNAME + " - " + movie.name
+	templateData['welcomeMessage'] = movie.name
+	templateData['welcomeDescription'] = movie.description
+	return render_template('storypage.html', **templateData)
+	
+
+@app.route("/search")
+def search():
+	query=request.args.get('query','')
+	#logger.error('---test in test!')
+	templateData={}
+	matches = []
+	for m in Story.objects:
+		app.logger.debug(m)
+		for field in [m.text, m.neighborhood, m.date, m.title, m.race]:
+			if query.lower() in field.lower():
+				matches.append(m)
+		#if query.lower() in m.text.lower() or if query.lower() in m.neighrborhood.lower():			
+	templateData['matches']=matches
+	templateData['title'] = PROJECTNAME + "- Search"
+	templateData['welcomeMessage'] = "Search Results"
+	templateData['welcomeDescription'] = "Searching for '" + query + "'"
+ 	return render_template('search.html', **templateData)
+ 
+@app.route("/allstories")
+def viewstories():
+	templateData={}
+	matches = []
+	for m in Story.objects:
+		matches.append(m)
+	templateData['matches']=matches
+	templateData['title'] = PROJECTNAME + " - All Stories"
+	templateData['welcomeMessage'] = "All Stories"
+	templateData['welcomeDescription'] = ""
+	return render_template('allstories.html', **templateData)
+	
+
 	
 
 # start the webserver
